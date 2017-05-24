@@ -12,9 +12,10 @@ namespace MongoDb.Sample
     {
         private readonly MyContext context = null;
 
-        public MeasuresService(Settings settings)
+     
+        public MeasuresService(string connectionString)
         {
-            context = new MyContext(settings);
+            context = new MyContext(connectionString);
         }
 
         public async Task Add(string json)

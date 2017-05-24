@@ -11,12 +11,14 @@ namespace MongoDb.Sample
     {
         private readonly IMongoDatabase _database = null;
 
-        public MyContext(Settings settings)
+        public MyContext(string connectionString)
         {
-            var client = new MongoClient(settings.ConnectionString);
+            var client = new MongoClient(connectionString);
+
+            var databaseName = MongoUrl.Create(connectionString).DatabaseName;
 
             if (client != null)
-                _database = client.GetDatabase(settings.Database);
+                _database = client.GetDatabase(databaseName);
         }
 
 

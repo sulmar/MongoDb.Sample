@@ -1,6 +1,8 @@
-﻿using MongoDb.Sample.Model;
+﻿using Microsoft.Extensions.Configuration;
+using MongoDb.Sample.Model;
 using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace MongoDb.Sample
@@ -11,11 +13,13 @@ namespace MongoDb.Sample
         {
             Console.WriteLine("MongoDb Client .NET Core DEMO");
 
+            var connectionString = GetConnectionString();
+
             //AddDocumentTest().Wait();
 
             //GetDocumentsTest().Wait();
 
-            Task.Run(() => SendDeviceToMongoDbMessagesAsync());
+            Task.Run(() => SendDeviceToMongoDbMessagesAsync(connectionString));
 
             Console.WriteLine("Press any key to exit.");
 
@@ -23,7 +27,20 @@ namespace MongoDb.Sample
 
         }
 
-        private static async void SendDeviceToMongoDbMessagesAsync()
+        private static string GetConnectionString()
+        {
+            var builder = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetCurrentDirectory())
+               .AddJsonFile("appsettings.json");
+
+            IConfigurationRoot Configuration = builder.Build();
+
+            var connectionString = Configuration.GetConnectionString("MyDatabase");
+
+            return connectionString;
+        }
+
+        private static async void SendDeviceToMongoDbMessagesAsync(string connectionString)
         {
             double temperature = 20;
             double pressure = 900;
@@ -32,9 +49,7 @@ namespace MongoDb.Sample
 
             Random rand = new Random();
 
-            var settings = new Settings { ConnectionString = "mongodb://localhost:27017", Database = "TestDb" };
-
-            IMeasuresService measuresService = new MeasuresService(settings);
+            IMeasuresService measuresService = new MeasuresService(connectionString);
 
             while (true)
             {
@@ -67,11 +82,9 @@ namespace MongoDb.Sample
 
         }
 
-        private static async Task GetDocumentsTest()
+        private static async Task GetDocumentsTest(string connectionString)
         {
-            var settings = new Settings { ConnectionString = "mongodb://localhost:27017", Database = "TestDb" };
-
-            IMeasuresService measuresService = new MeasuresService(settings);
+            IMeasuresService measuresService = new MeasuresService(connectionString);
 
             var documents = await measuresService.Get();
 
@@ -82,12 +95,10 @@ namespace MongoDb.Sample
 
         }
 
-        private static async Task AddDocumentTest()
+        private static async Task AddDocumentTest(string connectionString)
         {
-            
-            var settings = new Settings { ConnectionString = "mongodb://localhost:27017", Database = "TestDb" };
 
-            IMeasuresService measuresService = new MeasuresService(settings);
+            IMeasuresService measuresService = new MeasuresService(connectionString);
 
             for (int i = 0; i < 100; i++)
             {

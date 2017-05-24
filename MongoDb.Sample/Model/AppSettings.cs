@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MongoDb.Sample.Model
 {
-    public class Settings
+    public class AppSettings
     {
         public string ConnectionString;
         public string Database;
